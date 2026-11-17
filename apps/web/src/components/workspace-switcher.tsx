@@ -59,7 +59,7 @@ export function WorkspaceSwitcher() {
 
         setTimeout(() => {
           navigate({
-            to: "/dashboard/workspace/$workspaceId",
+            to: "/dashboard/workspace/$workspaceId/my-tasks",
             params: { workspaceId: selectedWorkspace.id },
           });
         }, 50);
