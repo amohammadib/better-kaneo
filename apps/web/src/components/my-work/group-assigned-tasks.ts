@@ -9,6 +9,24 @@ export type AssignedTaskGroup = {
   tasks: AssignedTask[];
 };
 
+export function groupAssignedTasksByStatus(
+  tasks: AssignedTask[],
+): AssignedTaskGroup[] {
+  const byStatus = new Map<string, AssignedTaskGroup>();
+
+  for (const task of tasks) {
+    const group = byStatus.get(task.status) ?? {
+      id: task.status,
+      title: task.statusName,
+      tasks: [],
+    };
+    group.tasks.push(task);
+    byStatus.set(task.status, group);
+  }
+
+  return [...byStatus.values()];
+}
+
 export function groupAssignedTasksByDueDate(
   tasks: AssignedTask[],
   now = new Date(),

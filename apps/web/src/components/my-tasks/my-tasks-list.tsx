@@ -5,6 +5,7 @@ import type { DueBucket } from "@/components/my-work/due-bucket";
 import {
   groupAssignedTasksByDueDate,
   groupAssignedTasksByProject,
+  groupAssignedTasksByStatus,
 } from "@/components/my-work/group-assigned-tasks";
 import type { AssignedTask } from "@/fetchers/task/get-assigned-tasks";
 import { useLocalDay } from "@/hooks/use-local-day";
@@ -30,7 +31,9 @@ export function MyTasksList({
     () =>
       groupBy === "project"
         ? groupAssignedTasksByProject(tasks)
-        : groupAssignedTasksByDueDate(tasks, new Date(day)),
+        : groupBy === "dueDate"
+          ? groupAssignedTasksByDueDate(tasks, new Date(day))
+          : groupAssignedTasksByStatus(tasks),
     [tasks, groupBy, day],
   );
 
