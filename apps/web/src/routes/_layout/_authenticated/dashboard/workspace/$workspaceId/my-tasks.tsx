@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CircleCheck } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import WorkspaceLayout from "@/components/common/workspace-layout";
 import {
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import useGetAssignedTasks from "@/hooks/queries/task/use-get-assigned-tasks";
+import TaskDetailsSheet from "@/components/task/task-details-sheet";
 
 export const Route = createFileRoute(
   "/_layout/_authenticated/dashboard/workspace/$workspaceId/my-tasks",
@@ -28,12 +29,22 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { t } = useTranslation();
   const { workspaceId } = Route.useParams();
+  const { projectId, taskId } = Route.useSearch();
+  const navigate = useNavigate();
   const {
     data: assigned,
     isLoading,
     isError,
   } = useGetAssignedTasks(workspaceId);
   const [groupBy, setGroupBy] = useState<MyTasksGroupBy>("status");
+
+  const handleCloseTaskSheet = useCallback(() => {
+    navigate({
+      to: ".",
+      search: {},
+      replace: true,
+    });
+  }, [navigate]);
 
   return (
     <>
@@ -85,6 +96,13 @@ function RouteComponent() {
               workspaceId={workspaceId}
             />
           )}
+
+          <TaskDetailsSheet
+            taskId={taskId}
+            projectId={projectId}
+            workspaceId={workspaceId}
+            onClose={handleCloseTaskSheet}
+          />
         </div>
       </WorkspaceLayout>
     </>
