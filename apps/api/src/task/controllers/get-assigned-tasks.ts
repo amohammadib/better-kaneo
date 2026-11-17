@@ -79,7 +79,11 @@ async function getAssignedTasks(
   // Existing databases may contain duplicate slugs from concurrent column
   // creation. A lateral lookup must return at most one decoration per task.
   const statusColumn = db
-    .select({ name: columnTable.name, icon: columnTable.icon })
+    .select({
+      name: columnTable.name,
+      icon: columnTable.icon,
+      position: columnTable.position,
+    })
     .from(columnTable)
     .where(
       and(
@@ -106,6 +110,7 @@ async function getAssignedTasks(
         status: taskTable.status,
         statusName: statusColumn.name,
         statusIcon: statusColumn.icon,
+        statusPosition: statusColumn.position,
         priority: taskTable.priority,
         dueDate: taskTable.dueDate,
         projectName: projectTable.name,
