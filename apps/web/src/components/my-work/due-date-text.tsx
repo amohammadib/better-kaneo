@@ -13,7 +13,18 @@ export function DueDateText({ dueDate, className }: DueDateTextProps) {
   const { t } = useTranslation();
   const day = useLocalDay();
 
-  if (!dueDate) return null;
+  if (!dueDate)
+    return (
+      <span
+        className={cn(
+          "text-xs tabular-nums",
+          "text-muted-foreground",
+          className,
+        )}
+      >
+        -
+      </span>
+    );
 
   const days = differenceInCalendarDays(new Date(dueDate), new Date(day));
   const text =

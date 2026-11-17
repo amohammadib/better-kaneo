@@ -6,8 +6,11 @@ import {
   eq,
   inArray,
   isNull,
+  isNotNull,
+  lte,
   ne,
   sql,
+  or,
 } from "drizzle-orm";
 import db from "../../database";
 import {
@@ -18,9 +21,6 @@ import {
 } from "../../database/schema";
 import { projectAccessCondition } from "../../project-access/project-access-condition";
 import { taskIsCompleted } from "../task-is-completed";
-
-// Home and My tasks render this list whole, so it stays one bounded page.
-export const ASSIGNED_TASKS_LIMIT = 100;
 
 const priorityRank = sql<number>`CASE
   WHEN ${taskTable.priority} = 'urgent' THEN 4
@@ -35,6 +35,22 @@ async function getAssignedTasks(
   userId: string,
   countOnly = false,
 ) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const fourteenDaysFromToday = new Date(today);
+  fourteenDaysFromToday.setDate(today.getDate() + 14);
+
+  const ignoreFarDates = or(
+    and(isNotNull(taskTable.startDate), lte(taskTable.startDate, today)),
+    and(
+      isNull(taskTable.startDate),
+      isNotNull(taskTable.dueDate),
+      lte(taskTable.dueDate, fourteenDaysFromToday),
+    ),
+    and(isNull(taskTable.startDate), isNull(taskTable.dueDate)),
+  );
+
   const openAndMine = and(
     eq(projectTable.workspaceId, workspaceId),
     isNull(projectTable.archivedAt),
@@ -46,6 +62,7 @@ async function getAssignedTasks(
         and ${columnTable.projectId} = ${taskTable.projectId}
     ), ${taskIsCompleted})`,
     projectAccessCondition(userId, projectTable.id),
+    ignoreFarDates,
   );
 
   const totalsQuery = db
@@ -62,7 +79,11 @@ async function getAssignedTasks(
   // Existing databases may contain duplicate slugs from concurrent column
   // creation. A lateral lookup must return at most one decoration per task.
   const statusColumn = db
-    .select({ name: columnTable.name, icon: columnTable.icon })
+    .select({
+      name: columnTable.name,
+      icon: columnTable.icon,
+      position: columnTable.position,
+    })
     .from(columnTable)
     .where(
       and(
@@ -89,6 +110,7 @@ async function getAssignedTasks(
         status: taskTable.status,
         statusName: statusColumn.name,
         statusIcon: statusColumn.icon,
+        statusPosition: statusColumn.position,
         priority: taskTable.priority,
         dueDate: taskTable.dueDate,
         projectName: projectTable.name,
@@ -104,8 +126,7 @@ async function getAssignedTasks(
         desc(priorityRank),
         asc(taskTable.createdAt),
         asc(taskTable.id),
-      )
-      .limit(ASSIGNED_TASKS_LIMIT),
+      ),
     totalsQuery,
   ]);
 

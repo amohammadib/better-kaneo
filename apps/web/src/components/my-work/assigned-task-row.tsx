@@ -19,8 +19,9 @@ export function AssignedTaskRow({
 }: AssignedTaskRowProps) {
   return (
     <Link
-      to="/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId"
-      params={{ workspaceId, projectId: task.projectId, taskId: task.id }}
+      to="/dashboard/workspace/$workspaceId/my-tasks"
+      params={{ workspaceId }}
+      search={{ projectId: task.projectId, taskId: task.id }}
       className="flex h-11 items-center gap-2.5 border-border/50 border-b px-1 outline-none transition-colors hover:bg-accent/50 focus-visible:bg-accent/50"
     >
       <span className="flex w-4 shrink-0 justify-center [&_svg]:size-3.5">

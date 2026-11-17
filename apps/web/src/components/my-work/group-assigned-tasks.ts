@@ -3,11 +3,31 @@ import { DUE_BUCKETS, type DueBucket, getDueBucket } from "./due-bucket";
 
 export type AssignedTaskGroup = {
   id: string;
+  position: number;
   // Set for due-date groups; project groups are labelled by `title`.
   bucket?: DueBucket;
   title?: string;
   tasks: AssignedTask[];
 };
+
+export function groupAssignedTasksByStatus(
+  tasks: AssignedTask[],
+): AssignedTaskGroup[] {
+  const byStatus = new Map<string, AssignedTaskGroup>();
+
+  for (const task of tasks) {
+    const group = byStatus.get(task.status) ?? {
+      id: task.status,
+      position: task.statusPosition,
+      title: task.statusName,
+      tasks: [],
+    };
+    group.tasks.push(task);
+    byStatus.set(task.status, group);
+  }
+
+  return [...byStatus.values()].sort((a, b) => a.position - b.position);
+}
 
 export function groupAssignedTasksByDueDate(
   tasks: AssignedTask[],
