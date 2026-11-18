@@ -1,6 +1,7 @@
 import { startOfDay } from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { DayPicker, type DateRange, type Matcher } from "react-day-picker";
+import { DayPicker } from "@daypicker/persian";
+import type { DateRange, Matcher } from "react-day-picker";
 import { cn } from "@/lib/cn";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 

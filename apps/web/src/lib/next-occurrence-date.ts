@@ -1,5 +1,5 @@
 import { TZDate } from "@date-fns/tz";
-import { addDays, addMonths, addWeeks, addYears } from "date-fns";
+import { addDays, addMonths, addWeeks, addYears } from "date-fns-jalali";
 import type { TaskRecurrence } from "@/types/task/recurrence";
 
 // Mirrors apps/api/src/task/recurrence/next-occurrence-date.ts so the date
