@@ -5,7 +5,7 @@ import {
   addWeeks,
   addYears,
   differenceInCalendarDays,
-} from "date-fns";
+} from "date-fns-jalali";
 import type { TaskRecurrence } from "./schema";
 
 const advance = {

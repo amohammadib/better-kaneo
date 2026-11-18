@@ -50,6 +50,7 @@
     "creem": "^1.13.0",
     "croner": "^11.0.0",
     "date-fns": "^4.4.0",
+    "date-fns-jalali": "4.4.0-0",
     "drizzle-kit": "^0.31.11",
     "drizzle-orm": "^0.45.4",
     "hono": "^4.13.14",
