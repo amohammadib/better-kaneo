@@ -4,7 +4,7 @@ import {
   type Day,
   isSameDay,
   isWeekend,
-  nextSaturday,
+  nextFriday,
   startOfDay,
   startOfWeek,
 } from "date-fns";
@@ -12,7 +12,7 @@ import {
 export type QuickDateId = "today" | "tomorrow" | "weekend" | "next-week";
 
 export function getThisWeekend(today: Date) {
-  return isWeekend(today) ? today : nextSaturday(today);
+  return isWeekend(today) ? today : nextFriday(today);
 }
 
 export function getNextWeek(today: Date, weekStartsOn: Day) {
