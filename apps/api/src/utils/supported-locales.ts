@@ -1,5 +1,6 @@
 // Mirrors i18n/resources.ts, which lies outside this package's rootDir.
 export const SUPPORTED_LOCALES = [
+  "fa-IR",
   "az-AZ",
   "mk-MK",
   "nl-NL",

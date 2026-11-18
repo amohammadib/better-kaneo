@@ -155,7 +155,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       sidebarDefaultOpen: true,
       setSidebarDefaultOpen: (open) => set({ sidebarDefaultOpen: open }),
 
-      weekStartsOn: 0,
+      weekStartsOn: 6,
       setWeekStartsOn: (weekStartsOn) => set({ weekStartsOn }),
 
       priorityIconStyle: "marks",
@@ -166,7 +166,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         if (state && !isWeekStartDay(state.weekStartsOn)) {
-          state.setWeekStartsOn(0);
+          state.setWeekStartsOn(6);
         }
       },
     },
