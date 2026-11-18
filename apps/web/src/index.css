@@ -2,8 +2,14 @@
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
 
+/* Auto detect ltr/rtl text on all elements */
 * {
   unicode-bidi: plaintext;
+}
+/* Set default text align to left to prevent rtl texts mess up the ui.
+   Elements with specified text align will override it. */
+body {
+  text-align: left;
 }
 
 input:-webkit-autofill,
