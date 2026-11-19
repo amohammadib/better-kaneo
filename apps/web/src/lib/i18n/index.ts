@@ -38,8 +38,7 @@ export function resolveLocale(
 }
 
 export function getBrowserLocale(): string | null {
-  if (typeof navigator === "undefined") return null;
-  return navigator.language || navigator.languages?.[0] || null;
+  return defaultLocale;
 }
 
 // Components subscribe to the default namespace only, so any other namespace
