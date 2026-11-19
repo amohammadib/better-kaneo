@@ -38,17 +38,9 @@ async function getAssignedTasks(
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const fourteenDaysFromToday = new Date(today);
-  fourteenDaysFromToday.setDate(today.getDate() + 14);
-
-  const ignoreFarDates = or(
+  const filterTasksWithoutStartDateOrStartDateIsArrived = or(
+    isNull(taskTable.startDate),
     and(isNotNull(taskTable.startDate), lte(taskTable.startDate, today)),
-    and(
-      isNull(taskTable.startDate),
-      isNotNull(taskTable.dueDate),
-      lte(taskTable.dueDate, fourteenDaysFromToday),
-    ),
-    and(isNull(taskTable.startDate), isNull(taskTable.dueDate)),
   );
 
   const openAndMine = and(
@@ -62,7 +54,7 @@ async function getAssignedTasks(
         and ${columnTable.projectId} = ${taskTable.projectId}
     ), ${taskIsCompleted})`,
     projectAccessCondition(userId, projectTable.id),
-    ignoreFarDates,
+    filterTasksWithoutStartDateOrStartDateIsArrived,
   );
 
   const totalsQuery = db
