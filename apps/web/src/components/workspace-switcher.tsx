@@ -47,15 +47,26 @@ export function WorkspaceSwitcher() {
     React.useState(false);
   const [isSwitching, setIsSwitching] = React.useState(false);
 
+  if (workspaces && workspaces.length > 1 && workspaces[0].id != "everything") {
+    workspaces?.unshift({
+      id: "everything",
+      name: "Everything",
+      slug: "everything",
+      createdAt: new Date(),
+    });
+  }
+
   const handleWorkspaceChange = React.useCallback(
     async (selectedWorkspace: Workspace) => {
       if (isSwitching) return;
 
       setIsSwitching(true);
       try {
-        await authClient.organization.setActive({
-          organizationId: selectedWorkspace.id,
-        });
+        if (selectedWorkspace.id != "everything") {
+          await authClient.organization.setActive({
+            organizationId: selectedWorkspace.id,
+          });
+        }
 
         setTimeout(() => {
           navigate({
@@ -191,7 +202,7 @@ export function WorkspaceSwitcher() {
         </SidebarMenu>
 
         <div className="flex items-center gap-0.5">
-          <Search />
+          {workspace.id != "everything" && <Search />}
           <div className="h-8 w-8 shrink-0">
             <UserAvatar />
           </div>

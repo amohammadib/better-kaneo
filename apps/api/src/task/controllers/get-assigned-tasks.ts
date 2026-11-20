@@ -18,6 +18,7 @@ import {
   labelTable,
   projectTable,
   taskTable,
+  workspaceTable,
 } from "../../database/schema";
 import { projectAccessCondition } from "../../project-access/project-access-condition";
 import { taskIsCompleted } from "../task-is-completed";
@@ -44,7 +45,9 @@ async function getAssignedTasks(
   );
 
   const openAndMine = and(
-    eq(projectTable.workspaceId, workspaceId),
+    workspaceId === "everything"
+      ? undefined
+      : eq(projectTable.workspaceId, workspaceId),
     isNull(projectTable.archivedAt),
     eq(taskTable.userId, userId),
     ne(taskTable.status, "archived"),
@@ -96,6 +99,8 @@ async function getAssignedTasks(
     db
       .select({
         id: taskTable.id,
+        workspaceId: projectTable.workspaceId,
+        workspaceName: workspaceTable.name,
         projectId: taskTable.projectId,
         number: taskTable.number,
         title: taskTable.title,
@@ -111,6 +116,10 @@ async function getAssignedTasks(
       })
       .from(taskTable)
       .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
+      .innerJoin(
+        workspaceTable,
+        eq(projectTable.workspaceId, workspaceTable.id),
+      )
       .leftJoinLateral(statusColumn, sql`true`)
       .where(openAndMine)
       .orderBy(

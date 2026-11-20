@@ -167,6 +167,8 @@ export function requireWorkspacePermission(permissions: PermissionMap) {
       throw new HTTPException(401, { message: "Unauthorized" });
     }
 
+    if (workspaceId === "everything") return next();
+
     const { roles, stored } = await memberRoles(c, workspaceId);
     if (!rolesAllow(roles, stored, permissions)) {
       throw new ApiError(403, {

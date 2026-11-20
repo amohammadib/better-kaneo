@@ -47,27 +47,47 @@ export function NavMain() {
     (notification) => !notification.isRead,
   ).length;
 
-  const navItems: NavItem[] = [
-    { title: t("navigation:sidebar.home"), icon: House, url: homeUrl },
-    {
-      title: t("navigation:sidebar.inbox"),
-      icon: Inbox,
-      url: `${homeUrl}/inbox`,
-      count: unreadCount,
-      emphasizeCount: true,
-    },
-    {
-      title: t("navigation:sidebar.myTasks"),
-      icon: CircleCheck,
-      url: `${homeUrl}/my-tasks`,
-      count: assignedTasks?.total,
-    },
-    {
-      title: t("navigation:sidebar.members"),
-      icon: Users,
-      url: `${homeUrl}/members`,
-    },
-  ];
+  let navItems: NavItem[] = [];
+
+  if (workspace.id === "everything") {
+    navItems = [
+      {
+        title: t("navigation:sidebar.inbox"),
+        icon: Inbox,
+        url: `${homeUrl}/inbox`,
+        count: unreadCount,
+        emphasizeCount: true,
+      },
+      {
+        title: t("navigation:sidebar.myTasks"),
+        icon: CircleCheck,
+        url: `${homeUrl}/my-tasks`,
+        count: assignedTasks?.total,
+      },
+    ];
+  } else {
+    navItems = [
+      { title: t("navigation:sidebar.home"), icon: House, url: homeUrl },
+      {
+        title: t("navigation:sidebar.inbox"),
+        icon: Inbox,
+        url: `${homeUrl}/inbox`,
+        count: unreadCount,
+        emphasizeCount: true,
+      },
+      {
+        title: t("navigation:sidebar.myTasks"),
+        icon: CircleCheck,
+        url: `${homeUrl}/my-tasks`,
+        count: assignedTasks?.total,
+      },
+      {
+        title: t("navigation:sidebar.members"),
+        icon: Users,
+        url: `${homeUrl}/members`,
+      },
+    ];
+  }
 
   // Invitations to other workspaces only matter while one is waiting.
   if (invitations.length > 0) {

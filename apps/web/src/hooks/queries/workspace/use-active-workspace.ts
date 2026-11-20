@@ -17,7 +17,14 @@ function useActiveWorkspace() {
   });
 
   const workspaceFromRoute = workspaceId
-    ? organizations?.find((organization) => organization.id === workspaceId)
+    ? workspaceId === "everything"
+      ? {
+          id: "everything",
+          name: "Everything",
+          slug: "everything",
+          createdAt: new Date(),
+        }
+      : organizations?.find((organization) => organization.id === workspaceId)
     : undefined;
   const workspace = workspaceFromRoute ?? activeOrganization;
   const isLoading =

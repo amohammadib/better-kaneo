@@ -36,8 +36,7 @@ export const Route = createFileRoute("/_layout/_authenticated/dashboard/")({
         workspaces.some((ws) => ws.id === activeWorkspaceId)
       ) {
         throw redirect({
-          to: "/dashboard/workspace/$workspaceId/my-tasks",
-          params: { workspaceId: activeWorkspaceId },
+          to: "/dashboard/workspace/everything/my-tasks",
         });
       }
 
@@ -48,8 +47,7 @@ export const Route = createFileRoute("/_layout/_authenticated/dashboard/")({
       });
 
       throw redirect({
-        to: "/dashboard/workspace/$workspaceId/my-tasks",
-        params: { workspaceId: firstWorkspace.id },
+        to: "/dashboard/workspace/everything/my-tasks",
       });
     }
     throw redirect({ to: "/onboarding" });

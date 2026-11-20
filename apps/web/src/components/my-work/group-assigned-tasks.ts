@@ -58,7 +58,7 @@ export function groupAssignedTasksByProject(
   for (const task of tasks) {
     const group = byProject.get(task.projectId) ?? {
       id: task.projectId,
-      title: task.projectName,
+      title: task.workspaceName + " / " + task.projectName,
       tasks: [],
     };
     group.tasks.push(task);

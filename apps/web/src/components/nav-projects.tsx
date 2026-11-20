@@ -221,7 +221,7 @@ export function NavProjects() {
     });
   };
 
-  if (!workspace) return null;
+  if (!workspace || workspace.id === "everything") return null;
 
   return (
     <>

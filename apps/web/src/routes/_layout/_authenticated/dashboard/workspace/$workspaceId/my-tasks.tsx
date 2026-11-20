@@ -29,7 +29,7 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { t } = useTranslation();
   const { workspaceId } = Route.useParams();
-  const { projectId, taskId } = Route.useSearch();
+  const { projectId, taskId, backTo } = Route.useSearch();
   const navigate = useNavigate();
   const {
     data: assigned,
@@ -39,12 +39,20 @@ function RouteComponent() {
   const [groupBy, setGroupBy] = useState<MyTasksGroupBy>("status");
 
   const handleCloseTaskSheet = useCallback(() => {
-    navigate({
-      to: ".",
-      search: {},
-      replace: true,
-    });
-  }, [navigate]);
+    if (backTo) {
+      navigate({
+        to: backTo,
+        search: {},
+        replace: true,
+      });
+    } else {
+      navigate({
+        to: ".",
+        search: {},
+        replace: true,
+      });
+    }
+  }, [navigate, backTo]);
 
   return (
     <>

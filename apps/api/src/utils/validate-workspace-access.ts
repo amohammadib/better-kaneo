@@ -37,6 +37,8 @@ export async function validateWorkspaceAccess(
     }
   }
 
+  if (workspaceId === "everything") return;
+
   const notFound = () =>
     new HTTPException(404, {
       message: options.notFoundMessage ?? "Workspace not found",
