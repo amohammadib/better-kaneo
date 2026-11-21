@@ -65,7 +65,10 @@ export function AssignedTaskRow({
           ))}
         </span>
       )}
-      <span className="hidden w-28 shrink-0 truncate text-muted-foreground text-xs sm:block">
+      <span
+        className="hidden w-50 shrink-0 truncate text-muted-foreground text-xs sm:block"
+        style={{ textWrap: "balance" }}
+      >
         {task.workspaceName + " / " + task.projectName}
       </span>
       <DueDateText
