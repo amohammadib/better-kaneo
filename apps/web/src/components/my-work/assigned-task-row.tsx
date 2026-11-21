@@ -65,12 +65,22 @@ export function AssignedTaskRow({
           ))}
         </span>
       )}
-      <span
-        className="hidden w-50 shrink-0 truncate text-muted-foreground text-xs sm:block"
-        style={{ textWrap: "balance" }}
-      >
-        {task.workspaceName + " / " + task.projectName}
-      </span>
+      {workspaceId === "everything" ? (
+        <span
+          className="hidden w-50 shrink-0 truncate text-muted-foreground text-xs sm:block"
+          style={{ textWrap: "balance" }}
+        >
+          {task.workspaceName + " / " + task.projectName}
+        </span>
+      ) : (
+        <span
+          className="hidden w-28 shrink-0 truncate text-muted-foreground text-xs sm:block"
+          style={{ textWrap: "balance" }}
+        >
+          {task.projectName}
+        </span>
+      )}
+
       <DueDateText
         dueDate={task.dueDate}
         className="shrink-0 text-right sm:w-20"

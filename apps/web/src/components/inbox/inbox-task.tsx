@@ -56,11 +56,12 @@ export function InboxTask({ taskId, workspaceId }: InboxTaskProps) {
     () => {
       if (!task || !openWorkspaceId) return;
       navigate({
-        to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId",
-        params: {
-          workspaceId: openWorkspaceId,
+        to: "/dashboard/workspace/$workspaceId/my-tasks",
+        params: { workspaceId: openWorkspaceId },
+        search: {
           projectId: task.projectId,
           taskId: task.id,
+          backTo: "/dashboard/workspace/" + workspaceId + "/inbox",
         },
       });
     },
@@ -119,11 +120,12 @@ export function InboxTask({ taskId, workspaceId }: InboxTaskProps) {
               size="xs"
               render={
                 <Link
-                  to="/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId"
-                  params={{
-                    workspaceId: linkWorkspaceId,
+                  to="/dashboard/workspace/$workspaceId/my-tasks"
+                  params={{ workspaceId: linkWorkspaceId }}
+                  search={{
                     projectId: task.projectId,
                     taskId: task.id,
+                    backTo: "/dashboard/workspace/" + workspaceId + "/inbox",
                   }}
                 />
               }

@@ -46,8 +46,7 @@ async function getNotifications(
         access,
       ),
     )
-    .orderBy(desc(notificationTable.createdAt))
-    .limit(50);
+    .orderBy(desc(notificationTable.createdAt));
 
   return rows.map(({ notification, projectId, workspaceId }) => {
     if (!projectId && !workspaceId) {

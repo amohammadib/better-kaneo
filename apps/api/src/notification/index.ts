@@ -154,7 +154,7 @@ const notification = apiRouter()
     c.json(
       await getNotifications(
         c.get("userId"),
-        c.req.valid("query").workspaceId,
+        passEverythingWorkspaceAsUndefined(c.req.valid("query").workspaceId),
         c.get("apiKey")?.permissions,
       ),
       200,
@@ -208,7 +208,7 @@ const notification = apiRouter()
     c.json(
       await markAllNotificationsAsRead(
         c.get("userId"),
-        c.req.valid("query").workspaceId,
+        passEverythingWorkspaceAsUndefined(c.req.valid("query").workspaceId),
         c.get("apiKey")?.permissions,
       ),
       200,
@@ -218,7 +218,7 @@ const notification = apiRouter()
     c.json(
       await clearNotifications(
         c.get("userId"),
-        c.req.valid("query").workspaceId,
+        passEverythingWorkspaceAsUndefined(c.req.valid("query").workspaceId),
         false,
         c.get("apiKey")?.permissions,
       ),
@@ -229,7 +229,7 @@ const notification = apiRouter()
     c.json(
       await clearNotifications(
         c.get("userId"),
-        c.req.valid("query").workspaceId,
+        passEverythingWorkspaceAsUndefined(c.req.valid("query").workspaceId),
         true,
         c.get("apiKey")?.permissions,
       ),
@@ -405,5 +405,10 @@ subscribeToEvent<{
     });
   }
 });
+
+function passEverythingWorkspaceAsUndefined(workspaceId?: string) {
+  if (workspaceId && workspaceId !== "everything") return workspaceId;
+  return undefined;
+}
 
 export default notification;
