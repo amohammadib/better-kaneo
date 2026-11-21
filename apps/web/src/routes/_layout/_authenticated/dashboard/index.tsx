@@ -1,7 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { getPendingInvitations } from "@/fetchers/invitation/get-pending-invitations";
 import getWorkspaces from "@/fetchers/workspace/get-workspaces";
-import { authClient } from "@/lib/auth-client";
 import { handleUnauthorized, isUnauthorizedError } from "@/lib/http-error";
 import type Workspace from "@/types/workspace";
 
@@ -9,12 +8,10 @@ export const Route = createFileRoute("/_layout/_authenticated/dashboard/")({
   beforeLoad: async () => {
     let workspaces: Workspace[];
     let invitations: Awaited<ReturnType<typeof getPendingInvitations>>;
-    let session: Awaited<ReturnType<typeof authClient.getSession>>;
     try {
-      [workspaces, invitations, session] = await Promise.all([
+      [workspaces, invitations] = await Promise.all([
         getWorkspaces(),
         getPendingInvitations(),
-        authClient.getSession(),
       ]);
     } catch (error) {
       if (isUnauthorizedError(error)) {
@@ -28,26 +25,12 @@ export const Route = createFileRoute("/_layout/_authenticated/dashboard/")({
       throw redirect({ to: "/invitations" });
     }
 
-    const activeWorkspaceId = session?.data?.session?.activeOrganizationId;
-
     if (workspaces && workspaces.length > 0) {
-      if (
-        activeWorkspaceId &&
-        workspaces.some((ws) => ws.id === activeWorkspaceId)
-      ) {
-        throw redirect({
-          to: "/dashboard/workspace/everything/my-tasks",
-        });
-      }
-
-      const firstWorkspace = workspaces[0];
-
-      authClient.organization.setActive({
-        organizationId: firstWorkspace.id,
-      });
-
       throw redirect({
-        to: "/dashboard/workspace/everything/my-tasks",
+        to: "/dashboard/workspace/$workspaceId/my-tasks",
+        params: {
+          workspaceId: workspaces.length > 1 ? "everything" : workspaces[0].id,
+        },
       });
     }
     throw redirect({ to: "/onboarding" });
