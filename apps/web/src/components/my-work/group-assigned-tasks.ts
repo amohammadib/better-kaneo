@@ -65,5 +65,7 @@ export function groupAssignedTasksByProject(
     byProject.set(task.projectId, group);
   }
 
-  return [...byProject.values()];
+  return [...byProject.values()].sort((a, b) =>
+    a?.title.localeCompare(b?.title),
+  );
 }
