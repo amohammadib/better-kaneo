@@ -11,8 +11,6 @@ import {
 import { projectAccessCondition } from "../../project-access/project-access-condition";
 import { commentExcerpt } from "../comment-excerpt";
 
-export const WORKSPACE_ACTIVITY_LIMIT = 20;
-
 // The feed is "what happened lately". The window also keeps the scan bounded
 // in workspaces with years of history.
 const WINDOW_DAYS = 30;
@@ -65,8 +63,7 @@ async function getWorkspaceActivities(workspaceId: string, userId: string) {
         gte(activityTable.createdAt, since),
       ),
     )
-    .orderBy(desc(activityTable.createdAt), desc(activityTable.id))
-    .limit(WORKSPACE_ACTIVITY_LIMIT);
+    .orderBy(desc(activityTable.createdAt), desc(activityTable.id));
 
   const statusChanges = rows.filter((row) => row.type === "status_changed");
   const statusSlugs = [

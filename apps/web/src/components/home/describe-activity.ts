@@ -78,6 +78,16 @@ export function describeActivity(activity: WorkspaceActivity, t: Translate) {
             });
       }
       break;
+    case "recurrence_changed":
+      if (eventData) {
+        const oldRecurrence = String(eventData.oldRecurrence);
+        const newRecurrence = String(eventData.newRecurrence);
+
+        return (
+          "changed recurrence from " + oldRecurrence + " to " + newRecurrence
+        );
+      }
+      return "changed recurrence";
     case "title_changed":
       if (eventData) {
         return t("activity:changedTitle", {

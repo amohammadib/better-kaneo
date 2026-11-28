@@ -56,6 +56,7 @@ function getActivityTypeIcon(type: string) {
     case "priority_changed":
       return <CircleAlert className={iconClass} />;
     case "due_date_changed":
+    case "recurrence_changed":
       return <Calendar className={iconClass} />;
     case "assignee_changed":
     case "unassigned":
@@ -284,6 +285,21 @@ function renderActivityContent({
     }
 
     return <span className="text-muted-foreground">{content}</span>;
+  }
+
+  if (activity.type === "recurrence_changed") {
+    if (eventData) {
+      const oldRecurrence = String(eventData.oldRecurrence);
+      const newRecurrence = String(eventData.newRecurrence);
+
+      return (
+        <span className="text-muted-foreground">
+          changed recurrence from {oldRecurrence} to {newRecurrence}
+        </span>
+      );
+    }
+
+    return <span className="text-muted-foreground">changed recurrence</span>;
   }
 
   if (activity.type === "unassigned") {

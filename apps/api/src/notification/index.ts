@@ -1,6 +1,11 @@
-import { eq } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import db from "../database";
-import { projectTable, taskTable } from "../database/schema";
+import {
+  projectTable,
+  taskTable,
+  workspaceMemberProjectTable,
+  workspaceUserTable,
+} from "../database/schema";
 import { subscribeToEvent } from "../events";
 import {
   apiRouter,
@@ -24,6 +29,7 @@ import {
   notificationParam,
   notificationWorkspaceQuery,
 } from "./schema";
+import { TaskRecurrence } from "../task/recurrence/schema";
 
 const listNotificationsRoute = createRoute({
   method: "get",
@@ -361,6 +367,147 @@ subscribeToEvent<{
       type: "task_assignee_changed",
       eventData: {
         taskTitle: data.title,
+        projectId: task?.projectId ?? null,
+        workspaceId: project?.workspaceId ?? null,
+      },
+      resourceId: data.taskId,
+      resourceType: "task",
+    });
+  }
+});
+
+subscribeToEvent<{
+  taskId: string;
+  userId: string;
+  oldDueDate: Date | null;
+  newDueDate: Date;
+  title: string;
+  type: string;
+}>("task.due_date_changed", async (data) => {
+  const [task] = await db
+    .select({
+      projectId: taskTable.projectId,
+      title: taskTable.title,
+    })
+    .from(taskTable)
+    .where(eq(taskTable.id, data.taskId))
+    .limit(1);
+
+  const [project] = task
+    ? await db
+        .select({ workspaceId: projectTable.workspaceId })
+        .from(projectTable)
+        .where(eq(projectTable.id, task.projectId))
+        .limit(1)
+    : [];
+
+  const projectAdmins =
+    task && project
+      ? await db
+          .select({ userId: workspaceMemberProjectTable.userId })
+          .from(workspaceMemberProjectTable)
+          .innerJoin(
+            workspaceUserTable,
+            eq(workspaceMemberProjectTable.userId, workspaceUserTable.userId),
+          )
+          .where(
+            and(
+              eq(workspaceMemberProjectTable.projectId, task.projectId),
+              inArray(workspaceUserTable.role, ["owner", "admin"]),
+            ),
+          )
+      : [];
+
+  for (const admin of projectAdmins) {
+    //TODO uncomment for production
+    // if (admin.userId === data.userId)
+    //   continue;
+
+    await createNotification({
+      userId: admin.userId,
+      type: "task_due_date_changed",
+      eventData: {
+        taskTitle: task?.title,
+        oldDueDate:
+          data.oldDueDate instanceof Date
+            ? data.oldDueDate.toISOString()
+            : data.oldDueDate,
+        newDueDate:
+          data.newDueDate instanceof Date
+            ? data.newDueDate.toISOString()
+            : data.newDueDate,
+        projectId: task?.projectId ?? null,
+        workspaceId: project?.workspaceId ?? null,
+      },
+      resourceId: data.taskId,
+      resourceType: "task",
+    });
+  }
+});
+
+subscribeToEvent<{
+  taskId: string;
+  userId: string;
+  oldRecurrence: TaskRecurrence | null;
+  newRecurrence: TaskRecurrence | null;
+  type: string;
+}>("task.recurrence_changed", async (data) => {
+  const [task] = await db
+    .select({
+      projectId: taskTable.projectId,
+      title: taskTable.title,
+    })
+    .from(taskTable)
+    .where(eq(taskTable.id, data.taskId))
+    .limit(1);
+
+  const [project] = task
+    ? await db
+        .select({ workspaceId: projectTable.workspaceId })
+        .from(projectTable)
+        .where(eq(projectTable.id, task.projectId))
+        .limit(1)
+    : [];
+
+  const projectAdmins =
+    task && project
+      ? await db
+          .select({ userId: workspaceMemberProjectTable.userId })
+          .from(workspaceMemberProjectTable)
+          .innerJoin(
+            workspaceUserTable,
+            eq(workspaceMemberProjectTable.userId, workspaceUserTable.userId),
+          )
+          .where(
+            and(
+              eq(workspaceMemberProjectTable.projectId, task.projectId),
+              inArray(workspaceUserTable.role, ["owner", "admin"]),
+            ),
+          )
+      : [];
+
+  for (const admin of projectAdmins) {
+    //TODO uncomment for production
+    // if (admin.userId === data.userId)
+    //   continue;
+
+    await createNotification({
+      userId: admin.userId,
+      type: "task_recurrence_changed",
+      eventData: {
+        taskTitle: task?.title,
+        oldRecurrence: data.oldRecurrence
+          ? data.oldRecurrence.frequency.toString() +
+            (data.oldRecurrence.interval == 1
+              ? ""
+              : " (every " + data.oldRecurrence.interval + " ones)")
+          : "no recurring",
+        newRecurrence: data.newRecurrence
+          ? data.newRecurrence.frequency.toString() +
+            (data.newRecurrence.interval == 1
+              ? ""
+              : " (every " + data.newRecurrence.interval + " ones)")
+          : "no recurring",
         projectId: task?.projectId ?? null,
         workspaceId: project?.workspaceId ?? null,
       },

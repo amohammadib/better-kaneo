@@ -28,6 +28,7 @@ import {
   updateCommentBody,
   workspaceIdParam,
 } from "./schema";
+import { TaskRecurrence } from "../task/recurrence/schema";
 
 const getWorkspaceActivitiesRoute = createRoute({
   method: "get",
@@ -348,6 +349,29 @@ subscribeToEvent<{
       data.newDueDate instanceof Date
         ? data.newDueDate.toISOString()
         : data.newDueDate,
+  });
+});
+
+subscribeToEvent<{
+  taskId: string;
+  userId: string;
+  oldRecurrence: TaskRecurrence | null;
+  newRecurrence: TaskRecurrence | null;
+  type: string;
+}>("task.recurrence_changed", async (data) => {
+  await createActivity(data.taskId, data.type, data.userId, null, {
+    oldRecurrence: data.oldRecurrence
+      ? data.oldRecurrence.frequency.toString() +
+        (data.oldRecurrence.interval == 1
+          ? ""
+          : " (every " + data.oldRecurrence.interval + " ones)")
+      : "no recurring",
+    newRecurrence: data.newRecurrence
+      ? data.newRecurrence.frequency.toString() +
+        (data.newRecurrence.interval == 1
+          ? ""
+          : " (every " + data.newRecurrence.interval + " ones)")
+      : "no recurring",
   });
 });
 

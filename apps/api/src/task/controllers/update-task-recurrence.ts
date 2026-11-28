@@ -15,6 +15,12 @@ async function updateTaskRecurrence({
   recurrence: TaskRecurrence | null;
   currentUserId: string;
 }) {
+  const [before] = await db
+    .select({ recurrence: taskTable.recurrence })
+    .from(taskTable)
+    .where(eq(taskTable.id, id))
+    .limit(1);
+
   // A completed task can only edit the rule it has yet to hand over. Setting
   // one after its next task took the rule would start a second series, so the
   // check runs in the update and rechecks the row once a claim releases it.
@@ -47,6 +53,15 @@ async function updateTaskRecurrence({
     taskId: task.id,
     projectId: task.projectId,
     userId: currentUserId,
+  });
+
+  await publishEvent("task.recurrence_changed", {
+    userId: currentUserId,
+    taskId: task.id,
+    projectId: task.projectId,
+    oldRecurrence: before?.recurrence,
+    newRecurrence: recurrence,
+    type: "recurrence_changed",
   });
 
   return task;
